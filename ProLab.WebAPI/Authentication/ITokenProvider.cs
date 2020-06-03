@@ -8,7 +8,7 @@ namespace ProLab.WebAPI.Authentication
 {
     public interface ITokenProvider
     {
-        string CreateToken(string userLogin, DateTime expiry);
+        string CreateToken(Model.Entidades.AUTENTICA usuario, DateTime expiry);
 
         TokenValidationParameters GetTokenValidationParameters();
     }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using ProLab.DataAccess;
 using ProLab.UnitOfWork;
+using ProLab.WebAPI.Authentication;
 
 namespace ProLab.WebAPI
 {
@@ -35,11 +38,10 @@ namespace ProLab.WebAPI
             // Auto Mapper
             services.AddAutoMapper(typeof(Startup));
 
+            services = this.SetTokenToService(services);
+
             //<swagger>
-            services.AddSwaggerGen(config =>
-            {
-                config.SwaggerDoc("v1", new OpenApiInfo { Title = "ProLapAPI", Version = "v1" });
-            });
+            services = this.SwaggerConfig(services);
             //</swagger>
 
             services.AddControllers();
@@ -74,6 +76,8 @@ namespace ProLab.WebAPI
             });
         }
 
+        #region MIS CONFIGURACIONES
+
         /// <summary>
         /// Se obtiene el ambiente utilizado, definido en el json config.
         /// </summary>
@@ -104,6 +108,50 @@ namespace ProLab.WebAPI
 
             return connectionString;
         }
+
+        /// <summary>
+        /// Configuración y validación del token.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private IServiceCollection SetTokenToService(IServiceCollection services)
+        {
+            //<Authentication JWT>
+            var tokenProvider = new JwtProvider("iusser", "audience", "tokenProvider");
+
+            services.AddSingleton<ITokenProvider>(tokenProvider);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = tokenProvider.GetTokenValidationParameters();
+                });
+
+            services.AddAuthorization(auth =>
+            {
+                auth.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                .RequireAuthenticatedUser()
+                .Build();
+            });
+            ///<Authentication JWT>
+            ///
+            return services;
+        }
+
+
+        /// <summary>
+        /// Configuración para el uso de swagger.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private IServiceCollection SwaggerConfig(IServiceCollection services) => services.AddSwaggerGen(config =>
+        {
+            config.SwaggerDoc("v1", new OpenApiInfo { Title = "ProLapAPI", Version = "v1" });
+        });
+
+        #endregion
 
     }
 }
