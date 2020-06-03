@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProLab.Model\ProLab.Model.csproj" />
+    <ProjectReference Include="..\ProLab.Repository\ProLab.Repository.csproj" />
+  </ItemGroup>
+
+</Project>
