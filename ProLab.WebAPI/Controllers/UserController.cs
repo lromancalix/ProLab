@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using U = ProLab.UnitOfWork;
 
@@ -56,8 +57,9 @@ namespace ProLab.WebAPI.Controllers
         {
             try
             {
-                var response =  await this._unitOfWork.User.GetUsuariosActivos();
-                return Ok( response );
+                List<Model.Entidades.USER_LAB> response =  await this._unitOfWork.User.GetUsuariosActivos();
+                var res = this._mapper.Map<List<Model.Response.UsuarioResponse>>(response);
+                return Ok( res );
 
             }
             catch (Exception e)

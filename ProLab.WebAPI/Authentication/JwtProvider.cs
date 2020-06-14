@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using ProLab.Model.Entidades;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -33,14 +34,14 @@ namespace ProLab.WebAPI.Authentication
 
         }
 
-        public string CreateToken(Model.Entidades.AUTENTICA usuario, DateTime expiry)
+        public string CreateToken(AUTENTICA usuario, DateTime expiry)
         {
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
             var identity = new ClaimsIdentity(
                     new List<Claim>()
                     {
-                        new Claim( ClaimTypes.Name, $"{usuario.FIRST_NAME} {usuario.FISRT_LAST_NAME}" ),
+                        new Claim( ClaimTypes.Name, $"{usuario.FIRST_NAME} {usuario.FIRST_LAST_NAME}" ),
                         new Claim(ClaimTypes.Role, $"{usuario.ROLE}"),
                         new Claim(ClaimTypes.PrimarySid, $"{usuario.ID.ToString()}")
                     }, "CUSTOM"

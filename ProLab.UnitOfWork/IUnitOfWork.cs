@@ -10,5 +10,7 @@ namespace ProLab.UnitOfWork
 
         R.IUserRepository User { get; }
 
+        R.ILoginRepository Login { get; }
+
     }
 }

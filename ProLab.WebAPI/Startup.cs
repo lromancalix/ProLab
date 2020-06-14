@@ -22,6 +22,7 @@ namespace ProLab.WebAPI
 {
     public class Startup
     {
+        private readonly string _misOrigenesPermitidos = "_misOrigenes";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -34,6 +35,9 @@ namespace ProLab.WebAPI
         {
 
             services.AddSingleton<IUnitOfWork>(option => new ProLabUnitOfWork(this.getDBConnetionString()));
+
+            // Add Cors
+            services = this.AddMyCors(services);
 
             // Auto Mapper
             services.AddAutoMapper(typeof(Startup));
@@ -55,7 +59,7 @@ namespace ProLab.WebAPI
             app.UseSwagger();
             app.UseSwaggerUI(config =>
             {
-                config.SwaggerEndpoint("/swagger/v1/swagger.json", "ProLapAPI");
+                config.SwaggerEndpoint("/prolab/swagger/v1/swagger.json", "ProLapAPI");
             });
 
 
@@ -66,7 +70,9 @@ namespace ProLab.WebAPI
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
+            app.UseRouting(); 
+
+            app.UseCors(this._misOrigenesPermitidos);
 
             app.UseAuthorization();
 
@@ -151,6 +157,22 @@ namespace ProLab.WebAPI
             config.SwaggerDoc("v1", new OpenApiInfo { Title = "ProLapAPI", Version = "v1" });
         });
 
+        private IServiceCollection AddMyCors(IServiceCollection services)
+        {
+            services.AddCors( options => {
+                options.AddPolicy( this._misOrigenesPermitidos,
+                        builder => 
+                        {
+                            builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+
+                        }
+                    );
+            } );
+            return services;
+        }
         #endregion
 
     }
